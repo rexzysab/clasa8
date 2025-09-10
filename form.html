@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Trimite Mesaj</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 300px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 5px;
+    }
+    input {
+      outline: none;
+    }
+    button {
+      background-color: #1e90ff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #63b3ff;
+    }
+    #notice {
+      margin-top: 15px;
+      color: #00ff00;
+      font-weight: bold;
+      min-height: 1em;
+    }
+  </style>
+</head>
+<body>
+  <form id="msgForm">
+    <label for="mesaj">Mesaj:</label>
+    <input type="text" id="mesaj" required placeholder="Scrie mesajul aici...">
+    <button type="submit">Trimite</button>
+  </form>
+  <div id="notice"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    // 🔑 Firebase config (folosește datele tale reale)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzKDeWm5Bvlx-V_GxDCrVEJ99qNrzOpvs",
+      authDomain: "sala-8-c6c0c.firebaseapp.com",
+      databaseURL: "https://sala-8-c6c0c-default-rtdb.firebaseio.com",
+      projectId: "sala-8-c6c0c",
+      storageBucket: "sala-8-c6c0c.firebasestorage.app",
+      messagingSenderId: "359851487930",
+      appId: "1:359851487930:web:aaf5839d669b616f774883",
+      measurementId: "G-Z9NEVRS4ED"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const msgForm = document.getElementById("msgForm");
+    const msgInput = document.getElementById("mesaj");
+    const notice = document.getElementById("notice");
+
+    msgForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const mesaj = msgInput.value.trim();
+      if (mesaj === "") return;
+
+      try {
+        await push(ref(db, "mesaje"), mesaj);
+        msgInput.value = "";
+        msgInput.focus();
+        notice.textContent = "Mesaj trimis!";
+        setTimeout(() => notice.textContent = "", 2000);
+      } catch (error) {
+        notice.textContent = "Eroare la trimitere!";
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
