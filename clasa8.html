@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Orar 08C</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #000;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    #ziua {
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #bbb;
+    }
+
+    #materia {
+      font-size: 3.5em;
+      font-weight: bold;
+      color: #00aaff;
+      text-shadow: 0 0 15px #00aaff, 0 0 30px #00aaff;
+      margin-bottom: 10px;
+    }
+
+    #interval {
+      font-size: 1.5em;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div id="ziua"></div>
+  <div id="materia"></div>
+  <div id="interval"></div>
+
+  <script>
+    const orar = {
+      "Luni": [
+        { interval: "08:00 - 08:50", materia: "Limba franceză" },
+        { interval: "09:00 - 09:50", materia: "Educație financiară" },
+        { interval: "10:00 - 10:50", materia: "Matematică" },
+        { interval: "11:00 - 11:50", materia: "Educație fizică și sport" },
+        { interval: "12:00 - 12:50", materia: "Istorie" },
+        { interval: "13:00 - 13:50", materia: "Fizică" },
+        { interval: "14:00 - 14:50", materia: "CDS - Matematică" }
+      ],
+      "Marți": [
+        { interval: "08:00 - 08:50", materia: "Biologie" },
+        { interval: "09:00 - 09:50", materia: "Educație tehnologică" },
+        { interval: "10:00 - 10:50", materia: "Fizică" },
+        { interval: "11:00 - 11:50", materia: "Chimie" },
+        { interval: "12:00 - 12:50", materia: "Educație muzicală" },
+        { interval: "13:00 - 13:50", materia: "Limba și literatura română" }
+      ],
+      "Miercuri": [
+        { interval: "08:00 - 08:50", materia: "Matematică" },
+        { interval: "09:00 - 09:50", materia: "Matematică" },
+        { interval: "10:00 - 10:50", materia: "Limba și literatura română" },
+        { interval: "11:00 - 11:50", materia: "Geografie" },
+        { interval: "12:00 - 12:50", materia: "Chimie" },
+        { interval: "13:00 - 13:50", materia: "Limba engleză" }
+      ],
+      "Joi": [
+        { interval: "08:00 - 08:50", materia: "CDS - Limba și literatura română" },
+        { interval: "09:00 - 09:50", materia: "Geografie" },
+        { interval: "10:00 - 10:50", materia: "Educație fizică și sport" },
+        { interval: "11:00 - 11:50", materia: "Limba și literatura română" },
+        { interval: "12:00 - 12:50", materia: "Matematică" },
+        { interval: "13:00 - 13:50", materia: "Consiliere și orientare" },
+        { interval: "14:00 - 14:50", materia: "Istorie" }
+      ],
+      "Vineri": [
+        { interval: "08:00 - 08:50", materia: "Informatică și TIC" },
+        { interval: "09:00 - 09:50", materia: "Religie" },
+        { interval: "10:00 - 10:50", materia: "Educație plastică" },
+        { interval: "11:00 - 11:50", materia: "Limba și literatura română" },
+        { interval: "12:00 - 12:50", materia: "Limba franceză" },
+        { interval: "13:00 - 13:50", materia: "Limba engleză" }
+      ]
+    };
+
+    const zile = ["Duminică", "Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă"];
+
+    function updateOrar() {
+      const acum = new Date();
+      const ziua = zile[acum.getDay()];
+      const ora = acum.getHours();
+      const minut = acum.getMinutes();
+
+      document.getElementById("ziua").textContent = ziua;
+
+      if (!orar[ziua]) {
+        document.getElementById("materia").textContent = "Weekend!";
+        document.getElementById("interval").textContent = "";
+        return;
+      }
+
+      let found = false;
+      orar[ziua].forEach(({interval, materia}) => {
+        const [start, end] = interval.split(" - ");
+        const [sh, sm] = start.split(":").map(Number);
+        const [eh, em] = end.split(":").map(Number);
+
+        const startMins = sh * 60 + sm;
+        const endMins = eh * 60 + em;
+        const nowMins = ora * 60 + minut;
+
+        if (nowMins >= startMins && nowMins <= endMins) {
+          document.getElementById("materia").textContent = materia;
+          document.getElementById("interval").textContent = interval;
+          found = true;
+        }
+      });
+
+      if (!found) {
+        document.getElementById("materia").textContent = "Pauză / Nicio oră acum";
+        document.getElementById("interval").textContent = "";
+      }
+    }
+
+    setInterval(updateOrar, 1000);
+    updateOrar();
+  </script>
+</body>
+</html>
