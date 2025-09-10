@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Display Mesaj</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: black;
+      color: white;
+      font-size: 4em;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="mesaj">Se încarcă...</div>
+
+  <script type="module">
+    // Import Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    // 🔑 Firebase config (folosește datele tale reale)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzKDeWm5Bvlx-V_GxDCrVEJ99qNrzOpvs",
+      authDomain: "sala-8-c6c0c.firebaseapp.com",
+      databaseURL: "https://sala-8-c6c0c-default-rtdb.firebaseio.com",
+      projectId: "sala-8-c6c0c",
+      storageBucket: "sala-8-c6c0c.firebasestorage.app",
+      messagingSenderId: "359851487930",
+      appId: "1:359851487930:web:aaf5839d669b616f774883",
+      measurementId: "G-Z9NEVRS4ED"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    async function loadMessage() {
+      try {
+        const snapshot = await get(child(ref(db), "mesaje"));
+        if (snapshot.exists()) {
+          const values = Object.values(snapshot.val());
+          const last = values[values.length - 1];
+          document.getElementById("mesaj").textContent = last;
+        } else {
+          document.getElementById("mesaj").textContent = "Niciun mesaj.";
+        }
+      } catch (error) {
+        console.error("Eroare la citirea mesajelor:", error);
+        document.getElementById("mesaj").textContent = "Eroare la încărcare.";
+      }
+    }
+
+    // Încarcă primul mesaj imediat
+    loadMessage();
+
+    // Reîncarcă automat la fiecare 20 secunde
+    setInterval(loadMessage, 20000);
+  </script>
+</body>
+</html>
