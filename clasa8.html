@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
-  <title>Orar Demo</title>
+  <title>Orar 08C</title>
   <style>
     body {
       margin: 0;
@@ -17,11 +17,9 @@
       text-align: center;
     }
 
-    #ora-curenta {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      font-size: 2em;
+    #ziua {
+      font-size: 2.5em;
+      margin-bottom: 20px;
     }
 
     #materia {
@@ -32,52 +30,89 @@
 
     #interval {
       font-size: 2.5em;
-      margin-bottom: 10px;
+      margin-bottom: 30px;
     }
 
     #countdown {
-      font-size: 2em;
-      color: #ccc;
+      font-size: 3em;
+      letter-spacing: 4px;
     }
   </style>
 </head>
 <body>
-  <div id="ora-curenta"></div>
+  <div id="ziua"></div>
   <div id="materia"></div>
   <div id="interval"></div>
   <div id="countdown"></div>
 
   <script>
-    // construim demo între 18:00 și 23:00
-    const orarDemo = [];
-    for (let h = 18; h < 23; h++) {
-      // ora de curs
-      orarDemo.push({
-        interval: `${String(h).padStart(2,"0")}:00 - ${String(h).padStart(2,"0")}:50`,
-        materia: "Matematică"
-      });
-      // pauză de 10 minute
-      orarDemo.push({
-        interval: `${String(h).padStart(2,"0")}:50 - ${String(h+1).padStart(2,"0")}:00`,
-        materia: "Pauză"
-      });
-    }
+    const orar = {
+      "Luni": [
+        { interval: "08:00 - 08:50", materia: "Limba franceză" },
+        { interval: "09:00 - 09:50", materia: "Educație financiară" },
+        { interval: "10:00 - 10:50", materia: "Matematică" },
+        { interval: "11:00 - 11:50", materia: "Educație fizică și sport" },
+        { interval: "12:00 - 12:50", materia: "Istorie" },
+        { interval: "13:00 - 13:50", materia: "Fizică" },
+        { interval: "14:00 - 14:50", materia: "CDS - Matematică" }
+      ],
+      "Marți": [
+        { interval: "08:00 - 08:50", materia: "Biologie" },
+        { interval: "09:00 - 09:50", materia: "Educație tehnologică" },
+        { interval: "10:00 - 10:50", materia: "Fizică" },
+        { interval: "11:00 - 11:50", materia: "Chimie" },
+        { interval: "12:00 - 12:50", materia: "Educație muzicală" },
+        { interval: "13:00 - 13:50", materia: "Limba și literatura română" }
+      ],
+      "Miercuri": [
+        { interval: "08:00 - 08:50", materia: "Matematică" },
+        { interval: "09:00 - 09:50", materia: "Matematică" },
+        { interval: "10:00 - 10:50", materia: "Limba și literatura română" },
+        { interval: "11:00 - 11:50", materia: "Geografie" },
+        { interval: "12:00 - 12:50", materia: "Chimie" },
+        { interval: "13:00 - 13:50", materia: "Limba engleză" }
+      ],
+      "Joi": [
+        { interval: "08:00 - 08:50", materia: "CDS - Limba și literatura română" },
+        { interval: "09:00 - 09:50", materia: "Geografie" },
+        { interval: "10:00 - 10:50", materia: "Educație fizică și sport" },
+        { interval: "11:00 - 11:50", materia: "Limba și literatura română" },
+        { interval: "12:00 - 12:50", materia: "Matematică" },
+        { interval: "13:00 - 13:50", materia: "Consiliere și orientare" },
+        { interval: "14:00 - 14:50", materia: "Istorie" }
+      ],
+      "Vineri": [
+        { interval: "08:00 - 08:50", materia: "Informatică și TIC" },
+        { interval: "09:00 - 09:50", materia: "Religie" },
+        { interval: "10:00 - 10:50", materia: "Educație plastică" },
+        { interval: "11:00 - 11:50", materia: "Limba și literatura română" },
+        { interval: "12:00 - 12:50", materia: "Limba franceză" },
+        { interval: "13:00 - 13:50", materia: "Limba engleză" }
+      ]
+    };
+
+    const zile = ["Duminică", "Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă"];
 
     function pad(n) { return n < 10 ? "0" + n : n; }
 
     function updateOrar() {
       const acum = new Date();
+      const ziua = zile[acum.getDay()];
       const ora = acum.getHours();
       const minut = acum.getMinutes();
       const secunda = acum.getSeconds();
-      const ms = acum.getMilliseconds();
 
-      // ora exactă în colț
-      document.getElementById("ora-curenta").textContent =
-        pad(ora) + ":" + pad(minut) + ":" + pad(secunda);
+      document.getElementById("ziua").textContent = ziua;
+
+      if (!orar[ziua]) {
+        document.getElementById("materia").textContent = "Weekend!";
+        document.getElementById("interval").textContent = "";
+        document.getElementById("countdown").textContent = "";
+        return;
+      }
 
       let found = false;
-      orarDemo.forEach(({ interval, materia }) => {
+      orar[ziua].forEach(({ interval, materia }) => {
         const [start, end] = interval.split(" - ");
         const [sh, sm] = start.split(":").map(Number);
         const [eh, em] = end.split(":").map(Number);
@@ -95,22 +130,21 @@
           const diff = endDate - acum;
           const mins = Math.floor(diff / 60000);
           const secs = Math.floor((diff % 60000) / 1000);
-          const millis = diff % 1000;
 
           document.getElementById("countdown").textContent =
-            `Timp rămas: ${pad(mins)}:${pad(secs)}.${millis}`;
+            `${pad(mins)}:${pad(secs)}`;
           found = true;
         }
       });
 
       if (!found) {
-        document.getElementById("materia").textContent = "Nicio oră acum";
+        document.getElementById("materia").textContent = "Pauză / Nicio oră acum";
         document.getElementById("interval").textContent = "";
         document.getElementById("countdown").textContent = "";
       }
     }
 
-    setInterval(updateOrar, 50);
+    setInterval(updateOrar, 500);
     updateOrar();
   </script>
 </body>
