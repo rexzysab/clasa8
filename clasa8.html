@@ -112,7 +112,8 @@
       }
 
       let found = false;
-      orar[ziua].forEach(({ interval, materia }) => {
+      for (let i = 0; i < orar[ziua].length; i++) {
+        const { interval, materia } = orar[ziua][i];
         const [start, end] = interval.split(" - ");
         const [sh, sm] = start.split(":").map(Number);
         const [eh, em] = end.split(":").map(Number);
@@ -124,6 +125,7 @@
         endDate.setHours(eh, em, 0, 0);
 
         if (acum >= startDate && acum <= endDate) {
+          // suntem într-o oră normală
           document.getElementById("materia").textContent = materia;
           document.getElementById("interval").textContent = interval;
 
@@ -134,11 +136,38 @@
           document.getElementById("countdown").textContent =
             `${pad(mins)}:${pad(secs)}`;
           found = true;
+          break;
         }
-      });
+
+        // dacă e pauză între ore
+        if (i < orar[ziua].length - 1) {
+          const [nextStart] = orar[ziua][i + 1].interval.split(" - ");
+          const [nsh, nsm] = nextStart.split(":").map(Number);
+
+          const pauzaStart = new Date(acum);
+          pauzaStart.setHours(eh, 50, 0, 0);
+
+          const pauzaEnd = new Date(acum);
+          pauzaEnd.setHours(nsh, nsm, 0, 0);
+
+          if (acum > endDate && acum < pauzaEnd) {
+            document.getElementById("materia").textContent = "Pauză";
+            document.getElementById("interval").textContent = `${pad(eh)}:50 - ${pad(nsh)}:00`;
+
+            const diff = pauzaEnd - acum;
+            const mins = Math.floor(diff / 60000);
+            const secs = Math.floor((diff % 60000) / 1000);
+
+            document.getElementById("countdown").textContent =
+              `${pad(mins)}:${pad(secs)}`;
+            found = true;
+            break;
+          }
+        }
+      }
 
       if (!found) {
-        document.getElementById("materia").textContent = "Pauză / Nicio oră acum";
+        document.getElementById("materia").textContent = "Nicio oră acum";
         document.getElementById("interval").textContent = "";
         document.getElementById("countdown").textContent = "";
       }
